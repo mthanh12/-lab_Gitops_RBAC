@@ -13,7 +13,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/w10-api
+  IMAGE_NAME: lab-gitops-rbac-api
 
 jobs:
   build-and-push:
@@ -43,7 +43,7 @@ jobs:
         shell: bash
         run: |
           owner="$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')"
-          echo "name=${REGISTRY}/${owner}/w10-api" >> "$GITHUB_OUTPUT"
+          echo "name=${REGISTRY}/${owner}/${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "version=${{ steps.semver.outputs.version }}" >> "$GITHUB_OUTPUT"
           echo "sha_tag=v${{ steps.semver.outputs.version }}-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
@@ -70,11 +70,19 @@ jobs:
           ignore-unfixed: true
 
       - name: Push image tags
+        id: push
+        shell: bash
         run: |
-          docker push ${{ steps.image.outputs.name }}:${{ steps.image.outputs.version }}
-          docker push ${{ steps.image.outputs.name }}:${{ steps.image.outputs.sha_tag }}
+          if docker push ${{ steps.image.outputs.name }}:${{ steps.image.outputs.version }} && \
+             docker push ${{ steps.image.outputs.name }}:${{ steps.image.outputs.sha_tag }}; then
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::GHCR refused the image push. Enable package write access or grant this repository access to the package, then rerun the workflow."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Resolve pushed image digest
+        if: ${{ steps.push.outputs.pushed == 'true' }}
         id: digest
         shell: bash
         run: |
@@ -82,9 +90,11 @@ jobs:
           echo "value=${digest}" >> "$GITHUB_OUTPUT"
 
       - name: Install Cosign
+        if: ${{ steps.push.outputs.pushed == 'true' }}
         uses: sigstore/cosign-installer@v3.7.0
 
       - name: Check Cosign configuration
+        if: ${{ steps.push.outputs.pushed == 'true' }}
         id: cosign
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
@@ -98,7 +108,7 @@ jobs:
           fi
 
       - name: Sign image
-        if: ${{ steps.cosign.outputs.enabled == 'true' }}
+        if: ${{ steps.push.outputs.pushed == 'true' && steps.cosign.outputs.enabled == 'true' }}
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
@@ -106,12 +116,14 @@ jobs:
           cosign sign --yes --key env://COSIGN_PRIVATE_KEY ${{ steps.digest.outputs.value }}
 
       - name: Update rollout.yaml with new version
+        if: ${{ steps.push.outputs.pushed == 'true' }}
         run: |
           sed -i "s|image: .*|image: ${{ steps.image.outputs.name }}:${{ steps.image.outputs.version }}|g" app-api/rollout.yaml
           sed -i "s|imagePullPolicy: .*|imagePullPolicy: Always|g" app-api/rollout.yaml
           sed -i "0,/value: \"v.*\"/s//value: \"v${{ steps.semver.outputs.version }}\"/" app-api/rollout.yaml
 
       - name: Commit and push version update
+        if: ${{ steps.push.outputs.pushed == 'true' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -124,6 +136,7 @@ jobs:
           fi
 
       - name: Create git tag
+        if: ${{ steps.push.outputs.pushed == 'true' }}
         run: |
           if git rev-parse "v${{ steps.semver.outputs.version }}" >/dev/null 2>&1; then
             echo "Tag already exists"
