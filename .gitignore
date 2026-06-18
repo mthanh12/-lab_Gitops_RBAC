@@ -1,0 +1,17 @@
+# Secrets - DO NOT COMMIT
+k8s-monitoring/email-secret.yaml
+k8s-monitoring/alertmanager-config.yaml
+**/email-secret.yaml
+*.secret.yaml
+cosign.key
+
+# IDE
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store

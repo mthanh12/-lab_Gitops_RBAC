@@ -1,0 +1,15 @@
+apiVersion: policy.sigstore.dev/v1beta1
+kind: ClusterImagePolicy
+metadata:
+  name: require-signed-w10-api
+spec:
+  images:
+    - glob: "ghcr.io/nguyentoan02/w10-api*"
+  authorities:
+    - name: repo-signing-key
+      key:
+        data: |
+          -----BEGIN PUBLIC KEY-----
+          MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAED8fi3/+BAghJgIY2J5psmkVx6ro7
+          P/rOtXo2jH1c6q8YfmjsbVhu/Pvn6YuYeDPCL5X+1vTlxsGwFPEvXfK3nA==
+          -----END PUBLIC KEY-----

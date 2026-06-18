@@ -1,0 +1,24 @@
+# ArgoCD App: Deploy Gatekeeper templates and constraints
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gatekeeper-constraints
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "11"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/nguyentoan02/Gitops_RBAC.git
+    path: gatekeeper/constraints
+    targetRevision: master
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gatekeeper-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - ServerSideApply=true
+    - SkipDryRunOnMissingResource=true

@@ -1,0 +1,1 @@
+{"spec":{"match":{"excludedNamespaces":["default","kube-system","argocd","gatekeeper-system","external-secrets"]}}}

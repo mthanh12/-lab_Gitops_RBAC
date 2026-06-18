@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-too-many-replicas
+  namespace: demo
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: test-too-many-replicas
+  template:
+    metadata:
+      labels:
+        app: test-too-many-replicas
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.27.0
+        securityContext:
+          runAsUser: 1000
+        resources:
+          limits:
+            cpu: 100m
+            memory: 64Mi
+

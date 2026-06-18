@@ -1,0 +1,35 @@
+# ArgoCD App: Install Gatekeeper controller via Helm chart
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gatekeeper
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  project: default
+  source:
+    repoURL: https://open-policy-agent.github.io/gatekeeper/charts
+    chart: gatekeeper
+    targetRevision: 3.16.3
+    helm:
+      releaseName: gatekeeper
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gatekeeper-system
+  ignoreDifferences:
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    jsonPointers:
+    - /metadata/annotations
+    - /metadata/managedFields
+    - /status
+    - /spec/conversion/webhook/clientConfig/caBundle
+    - /spec/preserveUnknownFields
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - RespectIgnoreDifferences=true
