@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/nguyentoan02/Gitops_RBAC.git
+    repoURL: https://github.com/mthanh12/-lab_Gitops_RBAC.git
     path: argocd/apps
     targetRevision: master
   destination:
