@@ -26,14 +26,14 @@ spec:
           optional: true
       containers:
       - name: api
-        image: ghcr.io/nguyentoan02/w10-api:0.0.2
+        image: ghcr.io/mthanh12/lab-gitops-rbac-api:0.0.1
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
           protocol: TCP
         env:
         - name: VERSION
-          value: "v0.0.2"
+          value: "v0.0.1"
         - name: ERROR_RATE
           value: "0"
         - name: DB_PASSWORD_PATH
