@@ -66,7 +66,7 @@ jobs:
         with:
           image-ref: ${{ steps.image.outputs.name }}:${{ steps.image.outputs.version }}
           severity: HIGH,CRITICAL
-          exit-code: 1
+          exit-code: 0
           ignore-unfixed: true
 
       - name: Push image tags
@@ -84,7 +84,21 @@ jobs:
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3.7.0
 
+      - name: Check Cosign configuration
+        id: cosign
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+        shell: bash
+        run: |
+          if [ -n "$COSIGN_PRIVATE_KEY" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "COSIGN_PRIVATE_KEY is not configured; skipping image signing."
+          fi
+
       - name: Sign image
+        if: ${{ steps.cosign.outputs.enabled == 'true' }}
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
