@@ -1,10 +1,10 @@
 apiVersion: policy.sigstore.dev/v1beta1
 kind: ClusterImagePolicy
 metadata:
-  name: require-signed-w10-api
+  name: require-signed-lab-gitops-rbac-api
 spec:
   images:
-    - glob: "ghcr.io/nguyentoan02/w10-api*"
+    - glob: "ghcr.io/mthanh12/lab-gitops-rbac-api*"
   authorities:
     - name: repo-signing-key
       key:

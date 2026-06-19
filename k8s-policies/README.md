@@ -2,7 +2,7 @@
 
 ## Files
 
-- `cluster-image-policy.yaml`: require signed image for `ghcr.io/nguyentoan02/w10-api*`
+- `cluster-image-policy.yaml`: require signed image for `ghcr.io/mthanh12/lab-gitops-rbac-api*`
 
 ## Before apply
 

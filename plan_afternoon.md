@@ -306,7 +306,7 @@ Trong `.github/workflows/build-push.yml`:
 
 Trong `k8s-policies/cluster-image-policy.yaml`:
 
-- require image `ghcr.io/nguyentoan02/w10-api*` phai co signature hop le
+- require image `ghcr.io/mthanh12/lab-gitops-rbac-api*` phai co signature hop le
 - verify bang public key trong `cosign.pub`
 
 ### ArgoCD
@@ -428,7 +428,7 @@ kubectl get rollout api -n demo -o yaml
 
 Kiem tra cac gia tri:
 
-- `image: ghcr.io/nguyentoan02/w10-api:<version>`
+- `image: ghcr.io/mthanh12/lab-gitops-rbac-api:<version>`
 - `imagePullPolicy: Always`
 
 Neu rollout dang `Suspended`, day la do canary pause step, khong phai loi.
@@ -449,7 +449,7 @@ Pass khi:
 ### Test 2 - Image duoc sign
 
 ```powershell
-cosign verify --key .\cosign.pub ghcr.io/nguyentoan02/w10-api:<tag>
+cosign verify --key .\cosign.pub ghcr.io/mthanh12/lab-gitops-rbac-api:<tag>
 ```
 
 Neu `cosign` chua nhan do PATH chua refresh:
@@ -475,18 +475,18 @@ Pass khi:
 
 ```powershell
 kubectl get clusterimagepolicy
-kubectl get clusterimagepolicy require-signed-w10-api -o yaml
+kubectl get clusterimagepolicy require-signed-lab-gitops-rbac-api -o yaml
 ```
 
 Pass khi:
 
-- co policy `require-signed-w10-api`
-- policy match image `ghcr.io/nguyentoan02/w10-api*`
+- co policy `require-signed-lab-gitops-rbac-api`
+- policy match image `ghcr.io/mthanh12/lab-gitops-rbac-api*`
 
 ### Test 5 - Unsigned image bi reject
 
 ```powershell
-kubectl run test-unsigned --image=ghcr.io/nguyentoan02/w10-api:unsigned-test -n demo
+kubectl run test-unsigned --image=ghcr.io/mthanh12/lab-gitops-rbac-api:unsigned-test -n demo
 ```
 
 Pass khi:
@@ -497,7 +497,7 @@ Pass khi:
 ### Test 6 - Signed image deploy duoc
 
 ```powershell
-kubectl run test-signed --image=ghcr.io/nguyentoan02/w10-api:<tag> -n demo
+kubectl run test-signed --image=ghcr.io/mthanh12/lab-gitops-rbac-api:<tag> -n demo
 ```
 
 Pass khi:

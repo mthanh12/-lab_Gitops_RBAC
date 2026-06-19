@@ -28,7 +28,7 @@ Can co san:
 
 Repo da duoc chot:
 
-- `https://github.com/nguyentoan02/Gitops_RBAC.git`
+- `https://github.com/mthanh12/-lab_Gitops_RBAC.git`
 - branch `master`
 
 Email alert da cau hinh local:
